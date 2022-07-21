@@ -1,15 +1,18 @@
+const dotenv = require('dotenv')
+dotenv.config()
+const cors = require('cors')
 const express = require('express')
 const passport = require('passport')
 const { googleAuth } = require('./configs/google.auth')
+const { authRoute } = require('./routes/auth.route')
 const session = require('express-session')
 const app = express()
 
-const dotenv = require('dotenv')
-dotenv.config()
-
 app.get('/', (req, res) => {
-    res.send('Helllo')
+    res.send("<a href='http://localhost:3990/auth/google'>click me</a>")
 })
+app.use(cors())
+app.use(express.json({ limit: '20mb' }))
 app.use(
     session({
         secret: process.env.SESSION_SECRET,
@@ -27,5 +30,6 @@ app.use(passport.session())
 
 app.listen(process.env.PORT, () => {
     console.log(`App is running on port ${process.env.PORT}`)
+    authRoute(app, passport)
     googleAuth(passport)
 })
