@@ -6,6 +6,8 @@ const passport = require('passport')
 const { googleAuth } = require('./configs/google.auth')
 const { authRoute } = require('./routes/auth.route')
 const session = require('express-session')
+const MongoStore = require('connect-mongo')
+const connectDB = require('./configs/db')
 const app = express()
 
 app.get('/', (req, res) => {
@@ -18,6 +20,7 @@ app.use(
         secret: process.env.SESSION_SECRET,
         resave: false,
         saveUninitialized: false,
+        store: MongoStore.create(options),
         cookie: {
             secure: false,
             expires: new Date(Date.now() + 10000),
@@ -30,6 +33,7 @@ app.use(passport.session())
 
 app.listen(process.env.PORT, () => {
     console.log(`App is running on port ${process.env.PORT}`)
+    connectDB()
     authRoute(app, passport)
     googleAuth(passport)
 })
